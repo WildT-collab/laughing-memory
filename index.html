@@ -7,26 +7,25 @@
     <title>La Pardor Car Wash</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* General Styling */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+            overflow-x: hidden; /* Prevent horizontal scroll */
             height: 100%;
         }
 
-        /* Moving Background */
+        /* Section to hold the moving background */
         .moving-background {
             position: relative;
             height: 100vh; /* Full height of the viewport */
-            background-image: url('images/Poster.png'); /* Using your image */
+            background-image: url('images/Poster.png'); /* Updated with your background image path */
             background-size: cover;
-            background-position: center;
+            background-position: center center;
+            background-attachment: fixed; /* Ensures the background stays fixed during scrolling */
             background-repeat: no-repeat;
         }
 
-        /* Hero Section Styling */
         header {
             text-align: center;
             color: white;
@@ -35,7 +34,6 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
         }
 
-        /* Main Content Styling */
         main {
             padding: 20px;
             text-align: center;
@@ -50,63 +48,31 @@
             padding: 50px;
             background-color: white;
             color: #333;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .content h3 {
             margin-top: 0;
         }
 
+        /* Adding some more content to simulate scrolling */
         .extra-content {
             padding: 100px;
             background-color: #f4f4f4;
-        }
-
-        /* Button Styling */
-        .book-btn {
-            background-color: #ff4d4d;
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            text-transform: uppercase;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        .book-btn:hover {
-            background-color: #e60000;
         }
     </style>
 </head>
 
 <body>
-    <!-- Moving Background Section -->
     <div class="moving-background">
         <header>
-            <h1>La Pardor Car Wash</h1>
-            <p>Experience unmatched detailing and car care right from the comfort of your home. Book your premium wash today!</p>
-            <button onclick="location.href='appointment.html'" class="book-btn">Book Appointment</button>
+            <h2>Welcome to La Pardor Car Wash</h2>
         </header>
     </div>
 
-    <!-- Main Content Section -->
     <main>
         <div class="content">
-            <h2>Why Choose La Pardor?</h2>
-            <p>At La Pardor, we provide high-quality, detail-oriented car washes that keep your vehicle looking pristine. Our team takes pride in delivering a premium service that brings out the shine in your car.</p>
-
-            <h3>Our Services Include:</h3>
-            <ul>
-                <li>Full Exterior Wash</li>
-                <li>Interior Detailing (Coming Soon...)</li>
-                <li>Wax & Polish</li>
-                <li>Tire & Wheel Cleaning</li>
-            </ul>
-
-            <button onclick="location.href='appointment.html'" class="book-btn">Book Your Premium Wash Now</button>
+            <h3>Book an Appointment</h3>
+            <p>We provide premium car wash services at your convenience. Book now for a time slot.</p>
         </div>
 
         <div class="extra-content">
@@ -114,19 +80,14 @@
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2024 La Pardor Car Wash | Premium Car Detailing Services</p>
-    </footer>
-
     <script>
         // JavaScript to make background move on scroll
-        window.addEventListener('scroll', function () {
-            const scrollPosition = window.scrollY;
-            const background = document.querySelector('.moving-background');
+        window.addEventListener('scroll', function() {
+            var scrollPosition = window.pageYOffset;
+            var background = document.querySelector('.moving-background');
 
-            // Adjust the background position to move at half the scroll speed
-            background.style.backgroundPosition = `center ${scrollPosition * 0.5}px`;
+            // Adjust the background position as you scroll
+            background.style.backgroundPositionY = -(scrollPosition * 0.5) + 'px'; // Move background slower
         });
     </script>
 </body>
