@@ -123,7 +123,7 @@
 
 <body>
     <!-- Video Background Section with autoplay sound -->
-    <video autoplay loop playsinline class="video-background fade-out" id="backgroundVideo">
+    <video autoplay loop playsinline class="video-background fade-out" id="backgroundVideo" muted>
         <source src="videos/New Ed.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
@@ -154,7 +154,7 @@
         const video = document.getElementById('backgroundVideo');
 
         function playWithSound() {
-            // Unmute and play video with sound if muted
+            // Ensure video is unmuted and plays automatically on user interaction
             video.muted = false;
             video.play();
         }
@@ -179,7 +179,15 @@
             }, 1500);
         }
 
-        // Set up a click event on the window to enable sound on interaction
+        // Auto play video and unmute it once the page loads
+        window.addEventListener('load', function() {
+            video.play();  // Auto play
+            setTimeout(() => {
+                video.muted = false;  // Unmute after a delay
+            }, 200);  // Delay to ensure video starts playing first
+        });
+
+        // Set up a click event to enable sound
         window.addEventListener('click', playWithSound, { once: true });
     </script>
 </body>
