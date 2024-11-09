@@ -114,10 +114,10 @@
 
         <!-- Time Slot Picker -->
         <div class="time-picker">
-            <div class="time-slot" onclick="selectTime('9:00 AM')">9:00 AM</div>
-            <div class="time-slot" onclick="selectTime('11:00 AM')">11:00 AM</div>
-            <div class="time-slot" onclick="selectTime('1:00 PM')">1:00 PM</div>
-            <div class="time-slot" onclick="selectTime('3:00 PM')">3:00 PM</div>
+            <div class="time-slot" onclick="selectTime(event, '9:00 AM')">9:00 AM</div>
+            <div class="time-slot" onclick="selectTime(event, '11:00 AM')">11:00 AM</div>
+            <div class="time-slot" onclick="selectTime(event, '1:00 PM')">1:00 PM</div>
+            <div class="time-slot" onclick="selectTime(event, '3:00 PM')">3:00 PM</div>
         </div>
 
         <button onclick="goToPayment()" class="next-btn" id="proceedButton" disabled>Proceed to Payment</button>
@@ -135,7 +135,7 @@
         }
 
         // Function to select time
-        function selectTime(time) {
+        function selectTime(event, time) {
             selectedTime = time;
             const timeSlots = document.querySelectorAll('.time-slot');
             timeSlots.forEach(slot => slot.classList.remove('selected')); // Remove selected class from all slots
