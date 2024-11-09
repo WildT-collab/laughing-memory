@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - La Pardor Car Wash</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h2>Appointment Details</h2>
+    </header>
+    <main>
+        <form id="appointmentForm" onsubmit="goToSlots(event)">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            
+            <label for="numberplate">Car Number Plate:</label>
+            <input type="text" id="numberplate" name="numberplate" required>
+            
+            <button type="submit" class="next-btn">Next</button>
+        </form>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
