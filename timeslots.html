@@ -1,31 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Time Slot - La Pardor Car Wash</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        main {
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .date-picker {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .date-picker div {
+            margin: 0 10px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .date-picker div:hover {
+            background-color: #0b89d6;
+            color: #fff;
+        }
+
+        .time-picker {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .time-slot {
+            margin: 0 10px;
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .time-slot:hover {
+            background-color: #0b89d6;
+            color: #fff;
+        }
+
+        .time-slot.selected {
+            background-color: #0b89d6;
+            color: #fff;
+        }
+
+        .next-btn {
+            background-color: #0b89d6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .next-btn:hover {
+            background-color: #007bb5;
+        }
+    </style>
 </head>
+
 <body>
     <header>
         <h2>Select a Time Slot</h2>
     </header>
     <main>
-        <p>Choose your preferred time:</p>
-        <select id="timeSlot">
-            <option value="9:00 AM">9:00 AM</option>
-            <option value="11:00 AM">11:00 AM</option>
-            <option value="1:00 PM">1:00 PM</option>
-            <option value="3:00 PM">3:00 PM</option>
-        </select>
-        <button onclick="goToPayment()" class="next-btn">Proceed to Payment</button>
+        <p>Pick a day and a time for your car wash:</p>
+
+        <!-- Day Picker -->
+        <div class="date-picker">
+            <div onclick="selectDay('Monday')">Monday</div>
+            <div onclick="selectDay('Tuesday')">Tuesday</div>
+            <div onclick="selectDay('Wednesday')">Wednesday</div>
+            <div onclick="selectDay('Thursday')">Thursday</div>
+            <div onclick="selectDay('Friday')">Friday</div>
+        </div>
+
+        <p id="selectedDay" style="font-size: 18px; font-weight: bold; margin-top: 20px;"></p>
+
+        <!-- Time Slot Picker -->
+        <div class="time-picker">
+            <div class="time-slot" onclick="selectTime('9:00 AM')">9:00 AM</div>
+            <div class="time-slot" onclick="selectTime('11:00 AM')">11:00 AM</div>
+            <div class="time-slot" onclick="selectTime('1:00 PM')">1:00 PM</div>
+            <div class="time-slot" onclick="selectTime('3:00 PM')">3:00 PM</div>
+        </div>
+
+        <button onclick="goToPayment()" class="next-btn" id="proceedButton" disabled>Proceed to Payment</button>
     </main>
+
     <script>
+        let selectedDay = '';
+        let selectedTime = '';
+
+        // Function to select day
+        function selectDay(day) {
+            selectedDay = day;
+            document.getElementById('selectedDay').innerText = `You selected: ${day}`;
+            enableProceedButton();
+        }
+
+        // Function to select time
+        function selectTime(time) {
+            selectedTime = time;
+            const timeSlots = document.querySelectorAll('.time-slot');
+            timeSlots.forEach(slot => slot.classList.remove('selected')); // Remove selected class from all slots
+            event.target.classList.add('selected'); // Add selected class to clicked slot
+            enableProceedButton();
+        }
+
+        // Enable the "Proceed to Payment" button when both day and time are selected
+        function enableProceedButton() {
+            if (selectedDay && selectedTime) {
+                document.getElementById('proceedButton').disabled = false;
+            }
+        }
+
+        // Proceed to the payment page
         function goToPayment() {
-            const timeSlot = document.getElementById('timeSlot').value;
-            sessionStorage.setItem('timeSlot', timeSlot);
+            sessionStorage.setItem('selectedDay', selectedDay);
+            sessionStorage.setItem('selectedTime', selectedTime);
             window.location.href = 'payment.html';
         }
     </script>
 </body>
+
 </html>
