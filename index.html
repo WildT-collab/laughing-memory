@@ -153,8 +153,9 @@
     <script>
         const video = document.getElementById('backgroundVideo');
 
+        // Ensure video plays and sound comes after user interaction
         function playWithSound() {
-            // Ensure video is unmuted and plays automatically on user interaction
+            // Unmute and play video after user interaction
             video.muted = false;
             video.play();
         }
@@ -181,13 +182,13 @@
 
         // Auto play video and unmute it once the page loads
         window.addEventListener('load', function() {
-            video.play();  // Auto play
+            video.play();  // Auto play video without sound
             setTimeout(() => {
-                video.muted = false;  // Unmute after a delay
-            }, 200);  // Delay to ensure video starts playing first
+                video.muted = false;  // Unmute after a brief delay
+            }, 500);  // Unmute after 500ms to ensure autoplay
         });
 
-        // Set up a click event to enable sound
+        // Handle the click to unmute the video
         window.addEventListener('click', playWithSound, { once: true });
     </script>
 </body>
