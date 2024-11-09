@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Pardor Car Wash</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Google Fonts for Tropical Supercar Theme -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Importing Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         /* General styling */
         body {
@@ -29,20 +29,53 @@
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
-            filter: brightness(0.7); /* Darkens the background for text readability */
+            filter: brightness(0.7);
         }
 
         /* Header Styling */
         header {
             text-align: center;
-            color: #ffdd67; /* Bright tropical yellow */
-            padding: 20px;
-            font-size: 42px;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6);
-            font-weight: 600;
+            color: #ffdd67;
+            padding: 60px 20px 20px;
         }
 
-        /* Main Section Styling */
+        header h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 58px;
+            font-weight: 700;
+            margin: 0;
+            color: #fffbe0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        header p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            margin-top: 10px;
+            color: #f0f0f0;
+            font-weight: 400;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Button Styling */
+        .book-btn {
+            background-color: #ff5733;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .book-btn:hover {
+            background-color: #ff3a1a;
+        }
+
+        /* Main Content Section */
         main {
             padding: 20px;
             text-align: center;
@@ -67,23 +100,6 @@
         .content h3 {
             margin-top: 0;
             color: #ffdd67;
-        }
-
-        /* Button Styling */
-        .book-btn {
-            background-color: #ff5733; /* Tropical coral */
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            font-size: 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
-        }
-
-        .book-btn:hover {
-            background-color: #ff3a1a;
         }
 
         /* Additional Content for Scroll Effect */
