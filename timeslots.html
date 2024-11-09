@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Time Slot - La Pardor Car Wash</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h2>Select a Time Slot</h2>
+    </header>
+    <main>
+        <p>Choose your preferred time:</p>
+        <select id="timeSlot">
+            <option value="9:00 AM">9:00 AM</option>
+            <option value="11:00 AM">11:00 AM</option>
+            <option value="1:00 PM">1:00 PM</option>
+            <option value="3:00 PM">3:00 PM</option>
+        </select>
+        <button onclick="goToPayment()" class="next-btn">Proceed to Payment</button>
+    </main>
+    <script>
+        function goToPayment() {
+            const timeSlot = document.getElementById('timeSlot').value;
+            sessionStorage.setItem('timeSlot', timeSlot);
+            window.location.href = 'payment.html';
+        }
+    </script>
+</body>
+</html>
