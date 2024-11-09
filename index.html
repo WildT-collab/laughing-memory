@@ -6,88 +6,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Pardor Car Wash</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts for Tropical Supercar Theme -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        /* General styling */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
-            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-x: hidden;
             height: 100%;
+            color: #f0f0f0;
+            background-color: #1b1b1b;
         }
 
-        /* Section to hold the moving background */
+        /* Moving Background Section */
         .moving-background {
             position: relative;
-            height: 100vh; /* Full height of the viewport */
-            background-image: url('images/Poster.png'); /* Updated with your background image path */
+            height: 100vh;
+            background-image: url('images/Poster.png');
             background-size: cover;
-            background-position: center center;
-            background-attachment: fixed; /* Ensures the background stays fixed during scrolling */
+            background-position: center;
+            background-attachment: fixed;
             background-repeat: no-repeat;
+            filter: brightness(0.7); /* Darkens the background for text readability */
         }
 
+        /* Header Styling */
         header {
             text-align: center;
-            color: white;
+            color: #ffdd67; /* Bright tropical yellow */
             padding: 20px;
-            font-size: 36px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+            font-size: 42px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6);
+            font-weight: 600;
         }
 
+        /* Main Section Styling */
         main {
             padding: 20px;
             text-align: center;
+            background-color: #242424;
         }
 
         h2 {
             margin-top: 0;
-            color: #333;
+            color: #ffdd67;
         }
 
+        /* Content Styling */
         .content {
-            padding: 50px;
-            background-color: white;
-            color: #333;
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         .content h3 {
             margin-top: 0;
+            color: #ffdd67;
         }
 
-        /* Adding some more content to simulate scrolling */
+        /* Button Styling */
+        .book-btn {
+            background-color: #ff5733; /* Tropical coral */
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .book-btn:hover {
+            background-color: #ff3a1a;
+        }
+
+        /* Additional Content for Scroll Effect */
         .extra-content {
-            padding: 100px;
-            background-color: #f4f4f4;
+            padding: 80px;
+            background-color: #333;
+            color: #f0f0f0;
         }
     </style>
 </head>
 
 <body>
+    <!-- Moving Background Section -->
     <div class="moving-background">
         <header>
-            <h2>Welcome to La Pardor Car Wash</h2>
+            <h1>Welcome to La Pardor Car Wash</h1>
+            <p>Premium Tropical-Inspired Car Wash Experience</p>
+            <button onclick="location.href='appointment.html'" class="book-btn">Book Appointment</button>
         </header>
     </div>
 
+    <!-- Main Content Section -->
     <main>
         <div class="content">
-            <h3>Book an Appointment</h3>
-            <p>We provide premium car wash services at your convenience. Book now for a time slot.</p>
+            <h2>Why Choose La Pardor?</h2>
+            <p>Experience a car wash that feels like a getaway. Our premium detailing brings out the shine in every car, so you can feel like you’re driving on an island paradise.</p>
         </div>
 
         <div class="extra-content">
-            <p>This is additional content. Scroll down to see the background effect!</p>
+            <p>Scroll down to see the background effect in action!</p>
         </div>
     </main>
 
+    <!-- Parallax Scrolling JavaScript -->
     <script>
-        // JavaScript to make background move on scroll
         window.addEventListener('scroll', function() {
             var scrollPosition = window.pageYOffset;
             var background = document.querySelector('.moving-background');
-
-            // Adjust the background position as you scroll
-            background.style.backgroundPositionY = -(scrollPosition * 0.5) + 'px'; // Move background slower
+            background.style.backgroundPositionY = -(scrollPosition * 0.5) + 'px';
         });
     </script>
 </body>
