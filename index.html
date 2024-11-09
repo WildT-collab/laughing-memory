@@ -20,22 +20,28 @@
             background-color: #1b1b1b;
         }
 
-        /* Moving Background Section */
-        .moving-background {
-            position: relative;
-            height: 100vh;
-            background-image: url('images/Poster.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            filter: brightness(0.7);
+        /* Video Background Section */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
         }
 
-        /* Header Styling */
-        header {
+        /* Overlay content on top of the video */
+        .overlay-content {
+            position: relative;
             text-align: center;
             padding: 60px 20px 20px;
+            color: #f0f0f0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         header h1 {
@@ -43,7 +49,7 @@
             font-size: 58px;
             font-weight: 700;
             margin: 0;
-            color: #ffdd67; /* Tropical-inspired color */
+            color: #ffdd67;
             text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
         }
 
@@ -51,7 +57,7 @@
             font-family: 'Poppins', sans-serif;
             font-size: 24px;
             margin-top: 10px;
-            color: #ffb347; /* Tropical sunset orange */
+            color: #ffb347;
             font-weight: 400;
             text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
         }
@@ -74,11 +80,23 @@
             background-color: #ff3a1a;
         }
 
+        /* Fade-out transition effect */
+        .fade-out {
+            opacity: 1;
+            transition: opacity 1.5s ease-out;
+        }
+
+        .fade-out-hidden {
+            opacity: 0;
+        }
+
         /* Main Content Section */
         main {
             padding: 20px;
             text-align: center;
             background-color: #242424;
+            color: #e0e0e0;
+            margin-top: 100vh;
         }
 
         h2 {
@@ -86,7 +104,6 @@
             color: #ffdd67;
         }
 
-        /* Content Styling */
         .content {
             padding: 40px;
             background-color: rgba(255, 255, 255, 0.05);
@@ -96,12 +113,6 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
-        .content h3 {
-            margin-top: 0;
-            color: #ffdd67;
-        }
-
-        /* Additional Content for Scroll Effect */
         .extra-content {
             padding: 80px;
             background-color: #333;
@@ -111,12 +122,18 @@
 </head>
 
 <body>
-    <!-- Moving Background Section -->
-    <div class="moving-background">
+    <!-- Video Background Section with autoplay sound -->
+    <video autoplay loop class="video-background fade-out" id="backgroundVideo" muted="false">
+        <source src="images/New Ed.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Overlay content on top of the video -->
+    <div class="overlay-content">
         <header>
             <h1>Welcome to La Pardor Car Wash</h1>
             <p>Premium Tropical-Inspired Car Wash Experience</p>
-            <button onclick="location.href='appointment.html'" class="book-btn">Book Appointment</button>
+            <button onclick="fadeOutVideo()" class="book-btn">Book Appointment</button>
         </header>
     </div>
 
@@ -128,17 +145,33 @@
         </div>
 
         <div class="extra-content">
-            <p>Scroll down to see the background effect in action!</p>
+            <p>Scroll down to see more information!</p>
         </div>
     </main>
 
-    <!-- Parallax Scrolling JavaScript -->
+    <!-- JavaScript for fade-out animation on button click -->
     <script>
-        window.addEventListener('scroll', function() {
-            var scrollPosition = window.pageYOffset;
-            var background = document.querySelector('.moving-background');
-            background.style.backgroundPositionY = -(scrollPosition * 0.5) + 'px';
-        });
+        const video = document.getElementById('backgroundVideo');
+
+        function fadeOutVideo() {
+            // Add a CSS class that fades out the video
+            video.classList.add('fade-out-hidden');
+
+            // Reduce the volume smoothly
+            let fadeAudio = setInterval(function () {
+                if (video.volume > 0.1) {
+                    video.volume -= 0.1;
+                } else {
+                    video.volume = 0;
+                    clearInterval(fadeAudio);
+                }
+            }, 100);
+            
+            // Redirect to appointment page after fade-out completes
+            setTimeout(() => {
+                window.location.href = 'appointment.html';
+            }, 1500);
+        }
     </script>
 </body>
 
