@@ -123,7 +123,7 @@
 
 <body>
     <!-- Video Background Section with autoplay sound -->
-    <video autoplay loop class="video-background fade-out" id="backgroundVideo" muted="false">
+    <video autoplay loop playsinline class="video-background fade-out" id="backgroundVideo">
         <source src="images/New Ed.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
@@ -153,8 +153,14 @@
     <script>
         const video = document.getElementById('backgroundVideo');
 
+        function playWithSound() {
+            // Unmute and play video with sound if muted
+            video.muted = false;
+            video.play();
+        }
+
         function fadeOutVideo() {
-            // Add a CSS class that fades out the video
+            // Fade out video and audio smoothly
             video.classList.add('fade-out-hidden');
 
             // Reduce the volume smoothly
@@ -166,12 +172,15 @@
                     clearInterval(fadeAudio);
                 }
             }, 100);
-            
+
             // Redirect to appointment page after fade-out completes
             setTimeout(() => {
                 window.location.href = 'appointment.html';
             }, 1500);
         }
+
+        // Set up a click event on the window to enable sound on interaction
+        window.addEventListener('click', playWithSound, { once: true });
     </script>
 </body>
 
