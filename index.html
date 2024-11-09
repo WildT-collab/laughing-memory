@@ -22,8 +22,7 @@
             height: 100vh; /* Full height of the viewport */
             background-image: url('images/Poster.png'); /* Using your image */
             background-size: cover;
-            background-position: center center;
-            background-attachment: fixed;
+            background-position: center;
             background-repeat: no-repeat;
         }
 
@@ -123,11 +122,11 @@
     <script>
         // JavaScript to make background move on scroll
         window.addEventListener('scroll', function () {
-            var scrollPosition = window.pageYOffset;
-            var background = document.querySelector('.moving-background');
+            const scrollPosition = window.scrollY;
+            const background = document.querySelector('.moving-background');
 
-            // Adjust the background position as you scroll
-            background.style.backgroundPositionY = -(scrollPosition * 0.5) + 'px'; // Move background slower
+            // Adjust the background position to move at half the scroll speed
+            background.style.backgroundPosition = `center ${scrollPosition * 0.5}px`;
         });
     </script>
 </body>
