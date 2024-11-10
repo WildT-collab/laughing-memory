@@ -51,6 +51,8 @@
             margin: 0;
             color: #ffdd67;
             text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
+            z-index: 2;
+            position: relative;
         }
 
         header p {
@@ -60,38 +62,10 @@
             color: #ffb347;
             font-weight: 400;
             text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+            z-index: 2;
+            position: relative;
         }
 
-        /* Main Content Section */
-        main {
-            padding: 20px;
-            text-align: center;
-            background-color: #242424;
-            color: #e0e0e0;
-            margin-top: 100vh;
-        }
-
-        h2 {
-            margin-top: 0;
-            color: #ffdd67;
-        }
-
-        .content {
-            padding: 40px;
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #e0e0e0;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .extra-content {
-            padding: 80px;
-            background-color: #333;
-            color: #f0f0f0;
-        }
-
-        /* Dust Effect */
         .dust-container {
             position: fixed;
             top: 0;
@@ -114,6 +88,11 @@
             transition: transform 1s ease-out, opacity 0.5s ease-out;
             opacity: 0.8;
         }
+
+        /* For better visibility of particles */
+        .dust-particle.hidden {
+            opacity: 0;
+        }
     </style>
 </head>
 
@@ -129,7 +108,6 @@
         <header>
             <h1 id="mainTitle">Welcome to La Pardor Car Wash</h1>
             <p id="subTitle">Premium Tropical-Inspired Car Wash Experience</p>
-            <button onclick="fadeOutVideo()" class="book-btn">Book Appointment</button>
         </header>
     </div>
 
@@ -151,18 +129,19 @@
     <!-- JavaScript for interactions -->
     <script>
         const dustContainer = document.getElementById('dustContainer');
+        const title = document.getElementById('mainTitle');
+        const subtitle = document.getElementById('subTitle');
+        const video = document.getElementById('backgroundVideo');
         let dustParticles = [];
         let isScrollingDown = false;
         let scrollPosition = 0;
-        let lastScrollY = 0;
+        let isDispersed = false;
 
         // Create dust particles
         function createDustParticles() {
             for (let i = 0; i < 30; i++) {
                 const particle = document.createElement('div');
                 particle.classList.add('dust-particle');
-                particle.style.left = `${Math.random() * 100}%`;
-                particle.style.top = `${Math.random() * 50}%`;
                 dustContainer.appendChild(particle);
                 dustParticles.push(particle);
             }
@@ -172,103 +151,66 @@
         function handleScroll() {
             const scrollTop = window.scrollY;
             const scrollThreshold = 300; // Distance before particles start scattering
-            const maxScatteringDistance = 300; // Maximum scattering distance for particles
 
-            // When scrolling down, scatter the particles
-            if (scrollTop > scrollThreshold && !isScrollingDown) {
-                isScrollingDown = true;
+            // If scrolled down enough, scatter particles from the title and subtitle
+            if (scrollTop > scrollThreshold && !isDispersed) {
+                isDispersed = true;
+                title.style.opacity = '0';
+                subtitle.style.opacity = '0';
+
+                // Scatter particles from the title and subtitle
                 dustParticles.forEach(particle => {
-                    const offsetX = Math.random() * maxScatteringDistance - maxScatteringDistance / 2;
-                    const offsetY = Math.random() * maxScatteringDistance - maxScatteringDistance / 2;
+                    const offsetX = Math.random() * 300 - 150;
+                    const offsetY = Math.random() * 200 - 100;
                     particle.style.transition = 'transform 2s ease-out, opacity 0.5s ease-out';
                     particle.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-                    particle.style.opacity = '0.8';
+                    particle.style.opacity = '1';
+                });
+
+                setTimeout(() => {
+                    dustParticles.forEach(particle => {
+                        particle.style.transition = 'transform 3s ease-in';
+                        particle.style.transform = `translateY(-100vh)`; // Move particles to top
+                    });
+                }, 1000); // 1 second delay before moving particles to the top
+            }
+
+            // Once particles have reached the top, scatter them across the screen while scrolling
+            if (scrollTop > scrollThreshold && isDispersed) {
+                dustParticles.forEach(particle => {
+                    particle.style.transition = 'transform 2s ease-out';
+                    const offsetX = Math.random() * 300 - 150;
+                    const offsetY = Math.random() * 200 - 100;
+                    particle.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
                 });
             }
 
-            // When scrolling up, reset particles to their initial positions
-            if (scrollTop < scrollThreshold && isScrollingDown) {
-                isScrollingDown = false;
+            // Scroll up: Return particles to their original form
+            if (scrollTop < scrollThreshold && isDispersed) {
+                isDispersed = false;
                 dustParticles.forEach(particle => {
-                    particle.style.transition = 'transform 2s ease-out, opacity 0.5s ease-out';
+                    particle.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
                     particle.style.transform = 'translate(0, 0)';
                     particle.style.opacity = '0.8';
                 });
+
+                title.style.opacity = '1';
+                subtitle.style.opacity = '1';
             }
-        }
-
-        // On Scroll: Track the scroll direction and scatter/reset particles accordingly
-        window.addEventListener('scroll', () => {
-            const currentScrollY = window.scrollY;
-            if (currentScrollY !== lastScrollY) {
-                handleScroll();
-                lastScrollY = currentScrollY;
-            }
-        });
-
-        // Drag particle functionality
-        let draggedParticle = null;
-
-        function startDrag(e) {
-            if (e.target.classList.contains('dust-particle')) {
-                draggedParticle = e.target;
-                const offsetX = e.clientX - draggedParticle.getBoundingClientRect().left;
-                const offsetY = e.clientY - draggedParticle.getBoundingClientRect().top;
-
-                function onMouseMove(moveEvent) {
-                    draggedParticle.style.left = `${moveEvent.clientX - offsetX}px`;
-                    draggedParticle.style.top = `${moveEvent.clientY - offsetY}px`;
-                }
-
-                function onMouseUp() {
-                    document.removeEventListener('mousemove', onMouseMove);
-                    document.removeEventListener('mouseup', onMouseUp);
-                    draggedParticle = null;
-                }
-
-                document.addEventListener('mousemove', onMouseMove);
-                document.addEventListener('mouseup', onMouseUp);
-            }
-        }
-
-        function startTouchDrag(e) {
-            e.preventDefault();
-            if (e.target.classList.contains('dust-particle')) {
-                draggedParticle = e.target;
-                const offsetX = e.touches[0].clientX - draggedParticle.getBoundingClientRect().left;
-                const offsetY = e.touches[0].clientY - draggedParticle.getBoundingClientRect().top;
-
-                function onTouchMove(moveEvent) {
-                    draggedParticle.style.left = `${moveEvent.touches[0].clientX - offsetX}px`;
-                    draggedParticle.style.top = `${moveEvent.touches[0].clientY - offsetY}px`;
-                }
-
-                function onTouchEnd() {
-                    document.removeEventListener('touchmove', onTouchMove);
-                    document.removeEventListener('touchend', onTouchEnd);
-                    draggedParticle = null;
-                }
-
-                document.addEventListener('touchmove', onTouchMove);
-                document.addEventListener('touchend', onTouchEnd);
-            }
-        }
-
-        // Add event listeners for drag (mouse and touch)
-        document.addEventListener('mousedown', startDrag);
-        document.addEventListener('touchstart', startTouchDrag);
-
-        // Fade-out video on button click
-        function fadeOutVideo() {
-            const video = document.getElementById('backgroundVideo');
-            video.classList.add('fade-out-hidden');
-            setTimeout(() => {
-                window.location.href = 'appointment.html';
-            }, 1500);
         }
 
         // Initialize dust particles
         createDustParticles();
+
+        // On Scroll: Track the scroll direction and scatter/reset particles accordingly
+        window.addEventListener('scroll', handleScroll);
+
+        // Mute the video initially and ensure the user clicks to unmute
+        window.addEventListener('click', () => {
+            if (video.muted) {
+                video.muted = false;
+            }
+        });
 
     </script>
 </body>
