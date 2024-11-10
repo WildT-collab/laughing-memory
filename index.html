@@ -51,6 +51,7 @@
             margin: 0;
             color: #ffdd67;
             text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s ease-out, filter 0.2s ease-out, opacity 0.2s ease-out;
         }
 
         header p {
@@ -60,6 +61,7 @@
             color: #ffb347;
             font-weight: 400;
             text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s ease-out, filter 0.2s ease-out, opacity 0.2s ease-out;
         }
 
         /* Button Styling */
@@ -131,8 +133,8 @@
     <!-- Overlay content on top of the video -->
     <div class="overlay-content">
         <header>
-            <h1>Welcome to La Pardor Car Wash</h1>
-            <p>Premium Tropical-Inspired Car Wash Experience</p>
+            <h1 id="mainTitle">Welcome to La Pardor Car Wash</h1>
+            <p id="subTitle">Premium Tropical-Inspired Car Wash Experience</p>
             <button onclick="fadeOutVideo()" class="book-btn">Book Appointment</button>
         </header>
     </div>
@@ -149,22 +151,39 @@
         </div>
     </main>
 
-    <!-- JavaScript for fade-out animation on button click -->
+    <!-- JavaScript for fade-out animation on button click and pixelation effect -->
     <script>
+        const mainTitle = document.getElementById('mainTitle');
+        const subTitle = document.getElementById('subTitle');
         const video = document.getElementById('backgroundVideo');
+
+        // Function to pixelate elements based on scroll position
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const maxScroll = window.innerHeight / 2;
+            const intensity = Math.min(scrollTop / maxScroll, 1);
+
+            // Apply transformations for pixelation effect
+            mainTitle.style.transform = `translateY(${-intensity * 20}px) scale(${1 - intensity * 0.2})`;
+            subTitle.style.transform = `translateY(${-intensity * 10}px) scale(${1 - intensity * 0.1})`;
+
+            // Apply pixelation and fade effect based on scroll intensity
+            mainTitle.style.filter = `blur(${intensity * 5}px) grayscale(${intensity})`;
+            subTitle.style.filter = `blur(${intensity * 3}px) grayscale(${intensity})`;
+            mainTitle.style.opacity = `${1 - intensity}`;
+            subTitle.style.opacity = `${1 - intensity}`;
+        });
 
         // Ensure video plays and sound comes after user interaction
         function playWithSound() {
-            // Unmute and play video after user interaction
             video.muted = false;
             video.play();
         }
 
         function fadeOutVideo() {
-            // Fade out video and audio smoothly
             video.classList.add('fade-out-hidden');
 
-            // Reduce the volume smoothly
+            // Gradually decrease volume
             let fadeAudio = setInterval(function () {
                 if (video.volume > 0.1) {
                     video.volume -= 0.1;
@@ -174,21 +193,19 @@
                 }
             }, 100);
 
-            // Redirect to appointment page after fade-out completes
+            // Redirect after fade-out
             setTimeout(() => {
                 window.location.href = 'appointment.html';
             }, 1500);
         }
 
-        // Auto play video and unmute it once the page loads
-        window.addEventListener('load', function() {
-            video.play();  // Auto play video without sound
+        window.addEventListener('load', function () {
+            video.play();
             setTimeout(() => {
-                video.muted = false;  // Unmute after a brief delay
-            }, 500);  // Unmute after 500ms to ensure autoplay
+                video.muted = false;
+            }, 500);
         });
 
-        // Handle the click to unmute the video
         window.addEventListener('click', playWithSound, { once: true });
     </script>
 </body>
