@@ -51,7 +51,6 @@
             margin: 0;
             color: #ffdd67;
             text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
-            transition: transform 0.2s ease-out, filter 0.2s ease-out, opacity 0.2s ease-out;
         }
 
         header p {
@@ -61,35 +60,6 @@
             color: #ffb347;
             font-weight: 400;
             text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
-            transition: transform 0.2s ease-out, filter 0.2s ease-out, opacity 0.2s ease-out;
-        }
-
-        /* Button Styling */
-        .book-btn {
-            background-color: #ff5733;
-            color: #fff;
-            border: none;
-            padding: 12px 24px;
-            font-size: 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-top: 20px;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
-        }
-
-        .book-btn:hover {
-            background-color: #ff3a1a;
-        }
-
-        /* Fade-out transition effect */
-        .fade-out {
-            opacity: 1;
-            transition: opacity 1.5s ease-out;
-        }
-
-        .fade-out-hidden {
-            opacity: 0;
         }
 
         /* Main Content Section */
@@ -120,12 +90,36 @@
             background-color: #333;
             color: #f0f0f0;
         }
+
+        /* Dust Effect */
+        .dust-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .dust-particle {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: auto;
+            transition: transform 1s ease-out, opacity 0.5s ease-out;
+            opacity: 0.8;
+        }
     </style>
 </head>
 
 <body>
     <!-- Video Background Section with autoplay sound -->
-    <video autoplay loop playsinline class="video-background fade-out" id="backgroundVideo" muted>
+    <video autoplay loop playsinline class="video-background" id="backgroundVideo" muted>
         <source src="videos/New Ed.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
@@ -151,62 +145,131 @@
         </div>
     </main>
 
-    <!-- JavaScript for fade-out animation on button click and pixelation effect -->
+    <!-- Dust Effect Container -->
+    <div class="dust-container" id="dustContainer"></div>
+
+    <!-- JavaScript for interactions -->
     <script>
-        const mainTitle = document.getElementById('mainTitle');
-        const subTitle = document.getElementById('subTitle');
-        const video = document.getElementById('backgroundVideo');
+        const dustContainer = document.getElementById('dustContainer');
+        let dustParticles = [];
+        let isScrollingDown = false;
+        let scrollPosition = 0;
+        let lastScrollY = 0;
 
-        // Function to pixelate elements based on scroll position
-        window.addEventListener('scroll', () => {
-            const scrollTop = window.scrollY;
-            const maxScroll = window.innerHeight / 2;
-            const intensity = Math.min(scrollTop / maxScroll, 1);
-
-            // Apply transformations for pixelation effect
-            mainTitle.style.transform = `translateY(${-intensity * 20}px) scale(${1 - intensity * 0.2})`;
-            subTitle.style.transform = `translateY(${-intensity * 10}px) scale(${1 - intensity * 0.1})`;
-
-            // Apply pixelation and fade effect based on scroll intensity
-            mainTitle.style.filter = `blur(${intensity * 5}px) grayscale(${intensity})`;
-            subTitle.style.filter = `blur(${intensity * 3}px) grayscale(${intensity})`;
-            mainTitle.style.opacity = `${1 - intensity}`;
-            subTitle.style.opacity = `${1 - intensity}`;
-        });
-
-        // Ensure video plays and sound comes after user interaction
-        function playWithSound() {
-            video.muted = false;
-            video.play();
+        // Create dust particles
+        function createDustParticles() {
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('dust-particle');
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 50}%`;
+                dustContainer.appendChild(particle);
+                dustParticles.push(particle);
+            }
         }
 
-        function fadeOutVideo() {
-            video.classList.add('fade-out-hidden');
+        // Scatter particles based on scroll position
+        function handleScroll() {
+            const scrollTop = window.scrollY;
+            const scrollThreshold = 300; // Distance before particles start scattering
+            const maxScatteringDistance = 300; // Maximum scattering distance for particles
 
-            // Gradually decrease volume
-            let fadeAudio = setInterval(function () {
-                if (video.volume > 0.1) {
-                    video.volume -= 0.1;
-                } else {
-                    video.volume = 0;
-                    clearInterval(fadeAudio);
+            // When scrolling down, scatter the particles
+            if (scrollTop > scrollThreshold && !isScrollingDown) {
+                isScrollingDown = true;
+                dustParticles.forEach(particle => {
+                    const offsetX = Math.random() * maxScatteringDistance - maxScatteringDistance / 2;
+                    const offsetY = Math.random() * maxScatteringDistance - maxScatteringDistance / 2;
+                    particle.style.transition = 'transform 2s ease-out, opacity 0.5s ease-out';
+                    particle.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+                    particle.style.opacity = '0.8';
+                });
+            }
+
+            // When scrolling up, reset particles to their initial positions
+            if (scrollTop < scrollThreshold && isScrollingDown) {
+                isScrollingDown = false;
+                dustParticles.forEach(particle => {
+                    particle.style.transition = 'transform 2s ease-out, opacity 0.5s ease-out';
+                    particle.style.transform = 'translate(0, 0)';
+                    particle.style.opacity = '0.8';
+                });
+            }
+        }
+
+        // On Scroll: Track the scroll direction and scatter/reset particles accordingly
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY !== lastScrollY) {
+                handleScroll();
+                lastScrollY = currentScrollY;
+            }
+        });
+
+        // Drag particle functionality
+        let draggedParticle = null;
+
+        function startDrag(e) {
+            if (e.target.classList.contains('dust-particle')) {
+                draggedParticle = e.target;
+                const offsetX = e.clientX - draggedParticle.getBoundingClientRect().left;
+                const offsetY = e.clientY - draggedParticle.getBoundingClientRect().top;
+
+                function onMouseMove(moveEvent) {
+                    draggedParticle.style.left = `${moveEvent.clientX - offsetX}px`;
+                    draggedParticle.style.top = `${moveEvent.clientY - offsetY}px`;
                 }
-            }, 100);
 
-            // Redirect after fade-out
+                function onMouseUp() {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                    draggedParticle = null;
+                }
+
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            }
+        }
+
+        function startTouchDrag(e) {
+            e.preventDefault();
+            if (e.target.classList.contains('dust-particle')) {
+                draggedParticle = e.target;
+                const offsetX = e.touches[0].clientX - draggedParticle.getBoundingClientRect().left;
+                const offsetY = e.touches[0].clientY - draggedParticle.getBoundingClientRect().top;
+
+                function onTouchMove(moveEvent) {
+                    draggedParticle.style.left = `${moveEvent.touches[0].clientX - offsetX}px`;
+                    draggedParticle.style.top = `${moveEvent.touches[0].clientY - offsetY}px`;
+                }
+
+                function onTouchEnd() {
+                    document.removeEventListener('touchmove', onTouchMove);
+                    document.removeEventListener('touchend', onTouchEnd);
+                    draggedParticle = null;
+                }
+
+                document.addEventListener('touchmove', onTouchMove);
+                document.addEventListener('touchend', onTouchEnd);
+            }
+        }
+
+        // Add event listeners for drag (mouse and touch)
+        document.addEventListener('mousedown', startDrag);
+        document.addEventListener('touchstart', startTouchDrag);
+
+        // Fade-out video on button click
+        function fadeOutVideo() {
+            const video = document.getElementById('backgroundVideo');
+            video.classList.add('fade-out-hidden');
             setTimeout(() => {
                 window.location.href = 'appointment.html';
             }, 1500);
         }
 
-        window.addEventListener('load', function () {
-            video.play();
-            setTimeout(() => {
-                video.muted = false;
-            }, 500);
-        });
+        // Initialize dust particles
+        createDustParticles();
 
-        window.addEventListener('click', playWithSound, { once: true });
     </script>
 </body>
 
