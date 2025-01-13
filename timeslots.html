@@ -91,20 +91,6 @@
         .next-btn:hover {
             background-color: #007bb5;
         }
-
-        .cancel-btn {
-            background-color: red;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            margin-top: 10px;
-            font-size: 16px;
-        }
-
-        .cancel-btn:hover {
-            background-color: #cc0000;
-        }
     </style>
 </head>
 
@@ -135,7 +121,7 @@
         </div>
 
         <button onclick="bookAppointment()" class="next-btn" id="proceedButton" disabled>Book Appointment</button>
-        <button onclick="cancelAppointment()" class="cancel-btn" id="cancelButton">Cancel Appointment</button>
+        <button onclick="cancelAppointment()" class="next-btn" style="background-color: red;" id="cancelButton">Cancel Appointment</button>
     </main>
 
     <script>
@@ -158,53 +144,57 @@
             enableProceedButton();
         }
 
-        // Enable the "Proceed to Payment" button when both day and time are selected
+        // Enable the "Book Appointment" button when both day and time are selected
         function enableProceedButton() {
             if (selectedDay && selectedTime) {
                 document.getElementById('proceedButton').disabled = false;
             }
         }
 
-        // Book Appointment
-        function bookAppointment() {
-            fetch('/notify', {
+        // Function to send notifications using Twilio Function
+        function sendNotification(type, day, time) {
+            fetch('https://appointmentnotifications-5895.twil.io/sendSMS', { // Your Twilio Function URL
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    type: 'booked',
-                    day: selectedDay,
-                    time: selectedTime,
+                    type: type,
+                    day: day,
+                    time: time,
                 }),
-            }).then(response => {
+            })
+            .then(response => {
                 if (response.ok) {
-                    alert('Your appointment has been booked!');
+                    alert('Notification sent successfully.');
                 } else {
-                    alert('Failed to book the appointment.');
+                    alert('Failed to send notification.');
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while sending the notification.');
             });
+        }
+
+        // Book Appointment
+        function bookAppointment() {
+            if (selectedDay && selectedTime) {
+                sendNotification('booked', selectedDay, selectedTime);
+                alert(`Your appointment is booked for ${selectedDay} at ${selectedTime}.`);
+            } else {
+                alert('Please select a day and time.');
+            }
         }
 
         // Cancel Appointment
         function cancelAppointment() {
-            fetch('/notify', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    type: 'cancelled',
-                    day: selectedDay,
-                    time: selectedTime,
-                }),
-            }).then(response => {
-                if (response.ok) {
-                    alert('Your appointment has been cancelled.');
-                } else {
-                    alert('Failed to cancel the appointment.');
-                }
-            });
+            if (selectedDay && selectedTime) {
+                sendNotification('cancelled', selectedDay, selectedTime);
+                alert(`Your appointment for ${selectedDay} at ${selectedTime} has been cancelled.`);
+            } else {
+                alert('Please select a day and time before cancelling.');
+            }
         }
     </script>
 </body>
