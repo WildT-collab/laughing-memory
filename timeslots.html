@@ -91,6 +91,20 @@
         .next-btn:hover {
             background-color: #007bb5;
         }
+
+        .cancel-btn {
+            background-color: red;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .cancel-btn:hover {
+            background-color: #cc0000;
+        }
     </style>
 </head>
 
@@ -120,8 +134,8 @@
             <div class="time-slot" onclick="selectTime(event, '3:00 PM')">3:00 PM</div>
         </div>
 
-        <button onclick="goToPayment()" class="next-btn" id="proceedButton" disabled>Book Appointment</button>
-        <button onclick="cancelAppointment()" class="next-btn" style="background-color: red;" id="cancelButton">Cancel Appointment</button>
+        <button onclick="bookAppointment()" class="next-btn" id="proceedButton" disabled>Book Appointment</button>
+        <button onclick="cancelAppointment()" class="cancel-btn" id="cancelButton">Cancel Appointment</button>
     </main>
 
     <script>
@@ -152,7 +166,7 @@
         }
 
         // Book Appointment
-        function goToPayment() {
+        function bookAppointment() {
             fetch('/notify', {
                 method: 'POST',
                 headers: {
@@ -196,4 +210,3 @@
 </body>
 
 </html>
-
