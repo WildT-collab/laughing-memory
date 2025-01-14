@@ -154,25 +154,30 @@
             }
         }
 
-        // Function to send notifications using Twilio Function
+        // Function to send notifications using Telegram
         function sendNotification(type, day, time) {
-            fetch('https://appointmentnotifications-5895.twil.io/sendSMS', { // Your Twilio Function URL
+            const botToken = '7903989500:AAFzraJYWL0Mi3srEY-Hzfw0oHUK4DROZ_8';
+            const chatId = '5532285629'; // Replace this with your actual chat ID
+
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+            const message = `${type === 'booked' ? 'New' : 'Cancelled'} appointment for ${day} at ${time}.`;
+
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    type: type,
-                    day: day,
-                    time: time,
+                    chat_id: chatId,
+                    text: message,
                 }),
             })
-            .then(response => response.json()) // Parse JSON response
+            .then(response => response.json())
             .then(data => {
-                if (data.success) {
+                if (data.ok) {
                     alert('Notification sent successfully.');
                 } else {
-                    alert(`Failed to send notification: ${data.message || 'Unknown error'}`);
+                    alert('Failed to send notification.');
                 }
             })
             .catch(error => {
