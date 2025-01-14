@@ -91,6 +91,13 @@
         .next-btn:hover {
             background-color: #007bb5;
         }
+
+        .input-field {
+            margin: 10px;
+            padding: 10px;
+            width: 200px;
+            font-size: 16px;
+        }
     </style>
 </head>
 
@@ -100,6 +107,10 @@
     </header>
     <main>
         <p>Pick a day and a time for your car wash:</p>
+
+        <!-- Customer Details -->
+        <input id="customerName" class="input-field" type="text" placeholder="Enter your name" required>
+        <input id="registrationPlate" class="input-field" type="text" placeholder="Enter your car's registration plate" required>
 
         <!-- Day Picker -->
         <div class="date-picker">
@@ -127,6 +138,8 @@
     <script>
         let selectedDay = '';
         let selectedTime = '';
+        let customerName = '';
+        let registrationPlate = '';
 
         // Function to select day
         function selectDay(day) {
@@ -148,7 +161,10 @@
         function enableButtons() {
             const proceedButton = document.getElementById('proceedButton');
             const cancelButton = document.getElementById('cancelButton');
-            if (selectedDay && selectedTime) {
+            customerName = document.getElementById('customerName').value.trim();
+            registrationPlate = document.getElementById('registrationPlate').value.trim();
+
+            if (selectedDay && selectedTime && customerName && registrationPlate) {
                 proceedButton.disabled = false;
                 cancelButton.disabled = false;
             }
@@ -160,7 +176,7 @@
             const chatId = '5532285629'; // Replace this with your actual chat ID
 
             const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-            const message = `${type === 'booked' ? 'New' : 'Cancelled'} appointment for ${day} at ${time}.`;
+            const message = `${type === 'booked' ? 'New' : 'Cancelled'} appointment for ${day} at ${time}. Customer: ${customerName}, Car Reg Plate: ${registrationPlate}.`;
 
             fetch(url, {
                 method: 'POST',
@@ -188,21 +204,21 @@
 
         // Book Appointment
         function bookAppointment() {
-            if (selectedDay && selectedTime) {
+            if (selectedDay && selectedTime && customerName && registrationPlate) {
                 sendNotification('booked', selectedDay, selectedTime);
                 alert(`Your appointment is booked for ${selectedDay} at ${selectedTime}.`);
             } else {
-                alert('Please select a day and time.');
+                alert('Please fill in all fields and select a day and time.');
             }
         }
 
         // Cancel Appointment
         function cancelAppointment() {
-            if (selectedDay && selectedTime) {
+            if (selectedDay && selectedTime && customerName && registrationPlate) {
                 sendNotification('cancelled', selectedDay, selectedTime);
                 alert(`Your appointment for ${selectedDay} at ${selectedTime} has been cancelled.`);
             } else {
-                alert('Please select a day and time before cancelling.');
+                alert('Please fill in all fields and select a day and time before cancelling.');
             }
         }
     </script>
