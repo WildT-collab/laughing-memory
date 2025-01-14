@@ -121,7 +121,7 @@
         </div>
 
         <button onclick="bookAppointment()" class="next-btn" id="proceedButton" disabled>Book Appointment</button>
-        <button onclick="cancelAppointment()" class="next-btn" style="background-color: red;" id="cancelButton">Cancel Appointment</button>
+        <button onclick="cancelAppointment()" class="next-btn" style="background-color: red;" id="cancelButton" disabled>Cancel Appointment</button>
     </main>
 
     <script>
@@ -132,7 +132,7 @@
         function selectDay(day) {
             selectedDay = day;
             document.getElementById('selectedDay').innerText = `You selected: ${day}`;
-            enableProceedButton();
+            enableButtons();
         }
 
         // Function to select time
@@ -141,13 +141,16 @@
             const timeSlots = document.querySelectorAll('.time-slot');
             timeSlots.forEach(slot => slot.classList.remove('selected')); // Remove selected class from all slots
             event.target.classList.add('selected'); // Add selected class to clicked slot
-            enableProceedButton();
+            enableButtons();
         }
 
-        // Enable the "Book Appointment" button when both day and time are selected
-        function enableProceedButton() {
+        // Enable the buttons when both day and time are selected
+        function enableButtons() {
+            const proceedButton = document.getElementById('proceedButton');
+            const cancelButton = document.getElementById('cancelButton');
             if (selectedDay && selectedTime) {
-                document.getElementById('proceedButton').disabled = false;
+                proceedButton.disabled = false;
+                cancelButton.disabled = false;
             }
         }
 
@@ -164,11 +167,12 @@
                     time: time,
                 }),
             })
-            .then(response => {
-                if (response.ok) {
+            .then(response => response.json()) // Parse JSON response
+            .then(data => {
+                if (data.success) {
                     alert('Notification sent successfully.');
                 } else {
-                    alert('Failed to send notification.');
+                    alert(`Failed to send notification: ${data.message || 'Unknown error'}`);
                 }
             })
             .catch(error => {
