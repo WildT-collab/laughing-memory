@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Pardor Car Wash</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Importing Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         /* General styling */
@@ -31,12 +30,11 @@
             z-index: -1;
         }
 
-        /* Overlay content on top of the video */
+        /* Overlay content */
         .overlay-content {
             position: relative;
             text-align: center;
             padding: 60px 20px 20px;
-            color: #f0f0f0;
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -47,25 +45,11 @@
         header h1 {
             font-family: 'Dancing Script', cursive;
             font-size: 58px;
-            font-weight: 700;
-            margin: 0;
             color: #ffdd67;
             text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
-            transition: transform 0.2s ease-out, filter 0.2s ease-out, opacity 0.2s ease-out;
         }
 
-        header p {
-            font-family: 'Poppins', sans-serif;
-            font-size: 24px;
-            margin-top: 10px;
-            color: #ffb347;
-            font-weight: 400;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
-            transition: transform 0.2s ease-out, filter 0.2s ease-out, opacity 0.2s ease-out;
-        }
-
-        /* Button Styling */
-        .book-btn {
+        .book-btn, .login-btn {
             background-color: #ff5733;
             color: #fff;
             border: none;
@@ -73,13 +57,48 @@
             font-size: 18px;
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
             margin-top: 20px;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
         }
 
-        .book-btn:hover {
+        .book-btn:hover, .login-btn:hover {
             background-color: #ff3a1a;
+        }
+
+        /* POPUP LOGIN MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #242424;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .modal button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .close-btn {
+            background-color: #ff3a1a;
+            margin-top: 10px;
         }
 
         /* Fade-out transition effect */
@@ -92,122 +111,106 @@
             opacity: 0;
         }
 
-        /* Main Content Section */
-        main {
-            padding: 20px;
-            text-align: center;
-            background-color: #242424;
-            color: #e0e0e0;
-            margin-top: 100vh;
-        }
-
-        h2 {
-            margin-top: 0;
-            color: #ffdd67;
-        }
-
-        .content {
-            padding: 40px;
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #e0e0e0;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .extra-content {
-            padding: 80px;
-            background-color: #333;
-            color: #f0f0f0;
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 
 <body>
-    <!-- Video Background Section with autoplay sound -->
+
+    <!-- Video Background -->
     <video autoplay loop playsinline class="video-background fade-out" id="backgroundVideo" muted>
         <source src="videos/New Ed.mp4" type="video/mp4">
-        Your browser does not support the video tag.
     </video>
 
-    <!-- Overlay content on top of the video -->
+    <!-- Overlay Content -->
     <div class="overlay-content">
         <header>
-            <h1 id="mainTitle">Welcome to La Pardor Car Wash</h1>
-            <p id="subTitle">Premium Tropical-Inspired Car Wash Experience</p>
-            <button onclick="fadeOutVideo()" class="book-btn">Book Appointment</button>
+            <h1>Welcome to La Pardor Car Wash</h1>
+            <p>Premium Tropical-Inspired Car Wash Experience</p>
+            <button class="login-btn" id="loginBtn">Login / Sign Up</button>
+            <button class="book-btn hidden" id="bookBtn">Book Appointment</button>
+            <button class="book-btn hidden" id="logoutBtn">Logout</button>
         </header>
     </div>
 
-    <!-- Main Content Section -->
-    <main>
-        <div class="content">
-            <h2>Why Choose La Pardor?</h2>
-            <p>Experience a car wash that feels like a getaway. Our premium detailing brings out the shine in every car, so you can feel like you’re driving on an island paradise.</p>
-        </div>
+    <!-- POPUP LOGIN MODAL -->
+    <div class="modal" id="loginModal">
+        <h2>Login / Sign Up</h2>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <button onclick="signup()">Sign Up</button>
+        <button class="close-btn" onclick="closeModal()">Close</button>
+    </div>
 
-        <div class="extra-content">
-            <p>Scroll down to see more information!</p>
-        </div>
-    </main>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-    <!-- JavaScript for fade-out animation on button click and pixelation effect -->
-    <script>
-        const mainTitle = document.getElementById('mainTitle');
-        const subTitle = document.getElementById('subTitle');
-        const video = document.getElementById('backgroundVideo');
+        // Your Firebase Config
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID",
+            measurementId: "YOUR_MEASUREMENT_ID"
+        };
 
-        // Function to pixelate elements based on scroll position
-        window.addEventListener('scroll', () => {
-            const scrollTop = window.scrollY;
-            const maxScroll = window.innerHeight / 2;
-            const intensity = Math.min(scrollTop / maxScroll, 1);
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-            // Apply transformations for pixelation effect
-            mainTitle.style.transform = `translateY(${-intensity * 20}px) scale(${1 - intensity * 0.2})`;
-            subTitle.style.transform = `translateY(${-intensity * 10}px) scale(${1 - intensity * 0.1})`;
+        // DOM Elements
+        const loginBtn = document.getElementById("loginBtn");
+        const bookBtn = document.getElementById("bookBtn");
+        const logoutBtn = document.getElementById("logoutBtn");
+        const loginModal = document.getElementById("loginModal");
 
-            // Apply pixelation and fade effect based on scroll intensity
-            mainTitle.style.filter = `blur(${intensity * 5}px) grayscale(${intensity})`;
-            subTitle.style.filter = `blur(${intensity * 3}px) grayscale(${intensity})`;
-            mainTitle.style.opacity = `${1 - intensity}`;
-            subTitle.style.opacity = `${1 - intensity}`;
-        });
+        // Open & Close Modal
+        loginBtn.addEventListener("click", () => loginModal.style.display = "block");
+        function closeModal() { loginModal.style.display = "none"; }
 
-        // Ensure video plays and sound comes after user interaction
-        function playWithSound() {
-            video.muted = false;
-            video.play();
+        // Login Function
+        function login() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => { closeModal(); })
+                .catch(error => alert(error.message));
         }
 
-        function fadeOutVideo() {
-            video.classList.add('fade-out-hidden');
-
-            // Gradually decrease volume
-            let fadeAudio = setInterval(function () {
-                if (video.volume > 0.1) {
-                    video.volume -= 0.1;
-                } else {
-                    video.volume = 0;
-                    clearInterval(fadeAudio);
-                }
-            }, 100);
-
-            // Redirect after fade-out
-            setTimeout(() => {
-                window.location.href = 'appointment.html';
-            }, 1500);
+        // Signup Function
+        function signup() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            createUserWithEmailAndPassword(auth, email, password)
+                .then(() => { closeModal(); })
+                .catch(error => alert(error.message));
         }
 
-        window.addEventListener('load', function () {
-            video.play();
-            setTimeout(() => {
-                video.muted = false;
-            }, 500);
+        // Logout Function
+        logoutBtn.addEventListener("click", () => {
+            signOut(auth);
         });
 
-        window.addEventListener('click', playWithSound, { once: true });
+        // Authentication State Change
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                loginBtn.classList.add("hidden");
+                bookBtn.classList.remove("hidden");
+                logoutBtn.classList.remove("hidden");
+            } else {
+                loginBtn.classList.remove("hidden");
+                bookBtn.classList.add("hidden");
+                logoutBtn.classList.add("hidden");
+            }
+        });
     </script>
-</body>
 
+</body>
 </html>
