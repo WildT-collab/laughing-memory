@@ -106,33 +106,30 @@
 
         <!-- Time Slot Picker -->
         <div id="timeSlots">
-            <div class="time-slot" onclick="bookAppointment('9:00 AM')">9:00 AM</div>
-            <div class="time-slot" onclick="bookAppointment('11:00 AM')">11:00 AM</div>
-            <div class="time-slot" onclick="bookAppointment('1:00 PM')">1:00 PM</div>
-            <div class="time-slot" onclick="bookAppointment('3:00 PM')">3:00 PM</div>
+            <div class="time-slot" onclick="selectTime(this, '9:00 AM')">9:00 AM</div>
+            <div class="time-slot" onclick="selectTime(this, '11:00 AM')">11:00 AM</div>
+            <div class="time-slot" onclick="selectTime(this, '1:00 PM')">1:00 PM</div>
+            <div class="time-slot" onclick="selectTime(this, '3:00 PM')">3:00 PM</div>
         </div>
 
+        <button onclick="bookAppointment()" class="next-btn" id="bookBtn" disabled>Book Appointment</button>
         <button onclick="cancelAppointment()" class="next-btn" style="background-color: red;">Cancel Appointment</button>
     </main>
 
     <script>
-        const user = auth.currentUser;
+        let selectedTime = "";
 
-        function checkLogin() {
-            auth.onAuthStateChanged(user => {
-                if (!user) {
-                    alert("Please log in first.");
-                    window.location.href = "index.html";
-                }
-            });
+        function selectTime(element, time) {
+            selectedTime = time;
+            document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove('selected'));
+            element.classList.add('selected');
+            document.getElementById("bookBtn").disabled = false;
         }
-
-        window.onload = checkLogin;
 
         function sendNotification(type, time) {
             const botToken = '7903989500:AAFzraJYWL0Mi3srEY-Hzfw0oHUK4DROZ_8';
             const chatId = '5532285629';
-            const message = `${type === 'booked' ? 'New' : 'Cancelled'} appointment for ${time}. Customer: ${customerName}, Car Reg Plate: ${registrationPlate}.`;
+            const message = `${type === 'booked' ? 'New' : 'Cancelled'} appointment for ${time}.`;
 
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
                 method: 'POST',
@@ -141,7 +138,7 @@
             });
         }
 
-        function bookAppointment(time) {
+        function bookAppointment() {
             const customerName = document.getElementById('customerName').value.trim();
             const registrationPlate = document.getElementById('registrationPlate').value.trim();
             const user = auth.currentUser;
@@ -151,21 +148,26 @@
                 return;
             }
 
+            if (!selectedTime || !customerName || !registrationPlate) {
+                alert("Please fill in all details and select a time.");
+                return;
+            }
+
             const userEmail = user.email;
 
-            db.collection("bookings").doc(time).get().then(doc => {
+            db.collection("bookings").doc(selectedTime).get().then(doc => {
                 if (doc.exists) {
                     alert("This time slot is already booked.");
                 } else {
-                    db.collection("bookings").doc(time).set({
+                    db.collection("bookings").doc(selectedTime).set({
                         userEmail,
                         customerName,
                         registrationPlate,
                         bookedAt: firebase.firestore.FieldValue.serverTimestamp()
                     }).then(() => {
-                        sendNotification("booked", time);
-                        alert(`Your appointment is booked for ${time}.`);
-                        document.querySelector(`.time-slot:contains("${time}")`).classList.add("booked");
+                        sendNotification("booked", selectedTime);
+                        alert(`Your appointment is booked for ${selectedTime}.`);
+                        document.querySelector(`.time-slot:contains("${selectedTime}")`).classList.add("booked");
                     });
                 }
             });
@@ -178,9 +180,7 @@
                 return;
             }
 
-            const userEmail = user.email;
-
-            db.collection("bookings").where("userEmail", "==", userEmail).get().then(querySnapshot => {
+            db.collection("bookings").where("userEmail", "==", user.email).get().then(querySnapshot => {
                 if (querySnapshot.empty) {
                     alert("You have no bookings to cancel.");
                 } else {
@@ -188,7 +188,6 @@
                         doc.ref.delete().then(() => {
                             sendNotification("cancelled", doc.id);
                             alert(`Your appointment for ${doc.id} has been cancelled.`);
-                            document.querySelector(`.time-slot:contains("${doc.id}")`).classList.remove("booked");
                         });
                     });
                 }
