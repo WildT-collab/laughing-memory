@@ -1,30 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Pardor Car Wash</title>
     <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <header>
-        <h1>La Pardor Car Wash</h1>
-        <p>Quality car wash services at your convenience.</p>
-        <button class="book-btn">Book Appointment</button>
-        <button id="login-btn">Login</button>
-        <button id="logout-btn" style="display: none;">Logout</button>
-    </header>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* General styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            height: 100%;
+            color: #f0f0f0;
+            background-color: #1b1b1b;
+        }
 
+        /* Video Background Section */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        /* Overlay content */
+        .overlay-content {
+            position: relative;
+            text-align: center;
+            padding: 60px 20px 20px;
+            color: #f0f0f0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        header h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 58px;
+            font-weight: 700;
+            margin: 0;
+            color: #ffdd67;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        header p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            margin-top: 10px;
+            color: #ffb347;
+            font-weight: 400;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Buttons */
+        .book-btn, .login-btn, .logout-btn {
+            background-color: #ff5733;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .book-btn:hover, .login-btn:hover, .logout-btn:hover {
+            background-color: #ff3a1a;
+        }
+
+        .logout-btn {
+            display: none;
+        }
+
+        /* Main Content Section */
+        main {
+            padding: 20px;
+            text-align: center;
+            background-color: #242424;
+            color: #e0e0e0;
+            margin-top: 100vh;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #ffdd67;
+        }
+
+        .extra-content {
+            padding: 80px;
+            background-color: #333;
+            color: #f0f0f0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Video Background -->
+    <video autoplay loop playsinline class="video-background" id="backgroundVideo" muted>
+        <source src="videos/New Ed.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Overlay content -->
+    <div class="overlay-content">
+        <header>
+            <h1 id="mainTitle">Welcome to La Pardor Car Wash</h1>
+            <p id="subTitle">Premium Tropical-Inspired Car Wash Experience</p>
+            <button onclick="fadeOutVideo()" class="book-btn">Book Appointment</button>
+            <button id="login-btn" class="login-btn">Login</button>
+            <button id="logout-btn" class="logout-btn">Logout</button>
+        </header>
+    </div>
+
+    <!-- Main Content Section -->
     <main>
-        <h2>Welcome to La Pardor Car Wash</h2>
-        <p>Book your appointment with ease and keep your car shining.</p>
+        <div class="extra-content">
+            <p>Scroll down to see more information!</p>
+        </div>
     </main>
 
-    <footer>
-        <p>&copy; 2025 La Pardor Car Wash. All Rights Reserved.</p>
-    </footer>
-
-    <!-- Firebase Scripts -->
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
@@ -46,20 +152,11 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Handle Authentication
+        // Authentication Elements
         const loginBtn = document.getElementById("login-btn");
         const logoutBtn = document.getElementById("logout-btn");
 
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                loginBtn.style.display = "none";
-                logoutBtn.style.display = "inline-block";
-            } else {
-                loginBtn.style.display = "inline-block";
-                logoutBtn.style.display = "none";
-            }
-        });
-
+        // Handle login
         loginBtn.addEventListener("click", () => {
             const email = prompt("Enter your email:");
             const password = prompt("Enter your password:");
@@ -72,6 +169,7 @@
                 });
         });
 
+        // Handle logout
         logoutBtn.addEventListener("click", () => {
             auth.signOut().then(() => {
                 alert("Logged out successfully!");
@@ -80,11 +178,26 @@
             });
         });
 
-        // Smooth scroll to main content
-        document.querySelector('.book-btn').addEventListener('click', function (e) {
-            e.preventDefault();
-            document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
+        // Update UI based on authentication status
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                loginBtn.style.display = "none";
+                logoutBtn.style.display = "inline-block";
+            } else {
+                loginBtn.style.display = "inline-block";
+                logoutBtn.style.display = "none";
+            }
         });
+
+        // Smooth scroll & fade out effect
+        function fadeOutVideo() {
+            document.getElementById("backgroundVideo").classList.add("fade-out-hidden");
+
+            setTimeout(() => {
+                window.location.href = 'appointment.html';
+            }, 1500);
+        }
     </script>
 </body>
+
 </html>
