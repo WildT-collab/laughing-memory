@@ -6,6 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Time Slot - La Pardor Car Wash</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyD7WxcybTS-Smz5ZDikSBAc-qNvwFhkGKA",
+            authDomain: "carwash-ce647.firebaseapp.com",
+            projectId: "carwash-ce647",
+            storageBucket: "carwash-ce647.appspot.com",
+            messagingSenderId: "361218725682",
+            appId: "1:361218725682:web:294ca3d3db3ef642f6292b",
+            measurementId: "G-9SGVPNG2SK"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,45 +45,15 @@
             text-align: center;
         }
 
-        h2 {
-            margin-top: 0;
-        }
-
-        .date-picker {
-            display: flex;
-            justify-content: center;
-            margin-top: 30px;
-        }
-
-        .date-picker div {
-            margin: 0 10px;
-            padding: 10px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .date-picker div:hover {
-            background-color: #0b89d6;
-            color: #fff;
-        }
-
-        .time-picker {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
         .time-slot {
-            margin: 0 10px;
+            margin: 10px;
             padding: 15px;
             background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            display: inline-block;
         }
 
         .time-slot:hover {
@@ -72,9 +61,10 @@
             color: #fff;
         }
 
-        .time-slot.selected {
-            background-color: #0b89d6;
-            color: #fff;
+        .time-slot.booked {
+            background-color: red;
+            color: white;
+            cursor: not-allowed;
         }
 
         .next-btn {
@@ -112,115 +102,113 @@
         <input id="customerName" class="input-field" type="text" placeholder="Enter your name" required>
         <input id="registrationPlate" class="input-field" type="text" placeholder="Enter your car's registration plate" required>
 
-        <!-- Day Picker -->
-        <div class="date-picker">
-            <div onclick="selectDay('Monday')">Monday</div>
-            <div onclick="selectDay('Tuesday')">Tuesday</div>
-            <div onclick="selectDay('Wednesday')">Wednesday</div>
-            <div onclick="selectDay('Thursday')">Thursday</div>
-            <div onclick="selectDay('Friday')">Friday</div>
-        </div>
-
         <p id="selectedDay" style="font-size: 18px; font-weight: bold; margin-top: 20px;"></p>
 
         <!-- Time Slot Picker -->
-        <div class="time-picker">
-            <div class="time-slot" onclick="selectTime(event, '9:00 AM')">9:00 AM</div>
-            <div class="time-slot" onclick="selectTime(event, '11:00 AM')">11:00 AM</div>
-            <div class="time-slot" onclick="selectTime(event, '1:00 PM')">1:00 PM</div>
-            <div class="time-slot" onclick="selectTime(event, '3:00 PM')">3:00 PM</div>
+        <div id="timeSlots">
+            <div class="time-slot" onclick="bookAppointment('9:00 AM')">9:00 AM</div>
+            <div class="time-slot" onclick="bookAppointment('11:00 AM')">11:00 AM</div>
+            <div class="time-slot" onclick="bookAppointment('1:00 PM')">1:00 PM</div>
+            <div class="time-slot" onclick="bookAppointment('3:00 PM')">3:00 PM</div>
         </div>
 
-        <button onclick="bookAppointment()" class="next-btn" id="proceedButton" disabled>Book Appointment</button>
-        <button onclick="cancelAppointment()" class="next-btn" style="background-color: red;" id="cancelButton" disabled>Cancel Appointment</button>
+        <button onclick="cancelAppointment()" class="next-btn" style="background-color: red;">Cancel Appointment</button>
     </main>
 
     <script>
-        let selectedDay = '';
-        let selectedTime = '';
-        let customerName = '';
-        let registrationPlate = '';
+        const user = auth.currentUser;
 
-        // Function to select day
-        function selectDay(day) {
-            selectedDay = day;
-            document.getElementById('selectedDay').innerText = `You selected: ${day}`;
-            enableButtons();
-        }
-
-        // Function to select time
-        function selectTime(event, time) {
-            selectedTime = time;
-            const timeSlots = document.querySelectorAll('.time-slot');
-            timeSlots.forEach(slot => slot.classList.remove('selected')); // Remove selected class from all slots
-            event.target.classList.add('selected'); // Add selected class to clicked slot
-            enableButtons();
-        }
-
-        // Enable the buttons when both day and time are selected
-        function enableButtons() {
-            const proceedButton = document.getElementById('proceedButton');
-            const cancelButton = document.getElementById('cancelButton');
-            customerName = document.getElementById('customerName').value.trim();
-            registrationPlate = document.getElementById('registrationPlate').value.trim();
-
-            if (selectedDay && selectedTime && customerName && registrationPlate) {
-                proceedButton.disabled = false;
-                cancelButton.disabled = false;
-            }
-        }
-
-        // Function to send notifications using Telegram
-        function sendNotification(type, day, time) {
-            const botToken = '7903989500:AAFzraJYWL0Mi3srEY-Hzfw0oHUK4DROZ_8';
-            const chatId = '5532285629'; // Replace this with your actual chat ID
-
-            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-            const message = `${type === 'booked' ? 'New' : 'Cancelled'} appointment for ${day} at ${time}. Customer: ${customerName}, Car Reg Plate: ${registrationPlate}.`;
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: message,
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.ok) {
-                    alert('Notification sent successfully.');
-                } else {
-                    alert('Failed to send notification.');
+        function checkLogin() {
+            auth.onAuthStateChanged(user => {
+                if (!user) {
+                    alert("Please log in first.");
+                    window.location.href = "index.html";
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while sending the notification.');
             });
         }
 
-        // Book Appointment
-        function bookAppointment() {
-            if (selectedDay && selectedTime && customerName && registrationPlate) {
-                sendNotification('booked', selectedDay, selectedTime);
-                alert(`Your appointment is booked for ${selectedDay} at ${selectedTime}.`);
-            } else {
-                alert('Please fill in all fields and select a day and time.');
-            }
+        window.onload = checkLogin;
+
+        function sendNotification(type, time) {
+            const botToken = '7903989500:AAFzraJYWL0Mi3srEY-Hzfw0oHUK4DROZ_8';
+            const chatId = '5532285629';
+            const message = `${type === 'booked' ? 'New' : 'Cancelled'} appointment for ${time}. Customer: ${customerName}, Car Reg Plate: ${registrationPlate}.`;
+
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: chatId, text: message })
+            });
         }
 
-        // Cancel Appointment
-        function cancelAppointment() {
-            if (selectedDay && selectedTime && customerName && registrationPlate) {
-                sendNotification('cancelled', selectedDay, selectedTime);
-                alert(`Your appointment for ${selectedDay} at ${selectedTime} has been cancelled.`);
-            } else {
-                alert('Please fill in all fields and select a day and time before cancelling.');
+        function bookAppointment(time) {
+            const customerName = document.getElementById('customerName').value.trim();
+            const registrationPlate = document.getElementById('registrationPlate').value.trim();
+            const user = auth.currentUser;
+
+            if (!user) {
+                alert("Please log in first.");
+                return;
             }
+
+            const userEmail = user.email;
+
+            db.collection("bookings").doc(time).get().then(doc => {
+                if (doc.exists) {
+                    alert("This time slot is already booked.");
+                } else {
+                    db.collection("bookings").doc(time).set({
+                        userEmail,
+                        customerName,
+                        registrationPlate,
+                        bookedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(() => {
+                        sendNotification("booked", time);
+                        alert(`Your appointment is booked for ${time}.`);
+                        document.querySelector(`.time-slot:contains("${time}")`).classList.add("booked");
+                    });
+                }
+            });
         }
+
+        function cancelAppointment() {
+            const user = auth.currentUser;
+            if (!user) {
+                alert("Please log in first.");
+                return;
+            }
+
+            const userEmail = user.email;
+
+            db.collection("bookings").where("userEmail", "==", userEmail).get().then(querySnapshot => {
+                if (querySnapshot.empty) {
+                    alert("You have no bookings to cancel.");
+                } else {
+                    querySnapshot.forEach(doc => {
+                        doc.ref.delete().then(() => {
+                            sendNotification("cancelled", doc.id);
+                            alert(`Your appointment for ${doc.id} has been cancelled.`);
+                            document.querySelector(`.time-slot:contains("${doc.id}")`).classList.remove("booked");
+                        });
+                    });
+                }
+            });
+        }
+
+        function resetWeeklyBookings() {
+            const now = new Date();
+            const nextMonday = new Date(now);
+            nextMonday.setDate(now.getDate() + ((7 - now.getDay()) % 7));
+            nextMonday.setHours(0, 0, 0, 0);
+
+            setTimeout(() => {
+                db.collection("bookings").get().then(snapshot => {
+                    snapshot.forEach(doc => doc.ref.delete());
+                });
+            }, nextMonday - now);
+        }
+
+        resetWeeklyBookings();
     </script>
 </body>
 
