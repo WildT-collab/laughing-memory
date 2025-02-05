@@ -1,215 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Pardor Car Wash</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        /* General styling */
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            height: 100%;
-            color: #f0f0f0;
-            background-color: #1b1b1b;
-        }
-
-        /* Video Background Section */
-        .video-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: -1;
-        }
-
-        /* Overlay content */
-        .overlay-content {
-            position: relative;
-            text-align: center;
-            padding: 60px 20px 20px;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        header h1 {
-            font-family: 'Dancing Script', cursive;
-            font-size: 58px;
-            color: #ffdd67;
-            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
-        }
-
-        .book-btn, .login-btn {
-            background-color: #ff5733;
-            color: #fff;
-            border: none;
-            padding: 12px 24px;
-            font-size: 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        .book-btn:hover, .login-btn:hover {
-            background-color: #ff3a1a;
-        }
-
-        /* POPUP LOGIN MODAL */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #242424;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            z-index: 1000;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal input {
-            width: 90%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        .modal button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .close-btn {
-            background-color: #ff3a1a;
-            margin-top: 10px;
-        }
-
-        /* Fade-out transition effect */
-        .fade-out {
-            opacity: 1;
-            transition: opacity 1.5s ease-out;
-        }
-
-        .fade-out-hidden {
-            opacity: 0;
-        }
-
-        .hidden {
-            display: none;
-        }
-    </style>
-</head>
-
-<body>
-
-    <!-- Video Background -->
-    <video autoplay loop playsinline class="video-background fade-out" id="backgroundVideo" muted>
-        <source src="videos/New Ed.mp4" type="video/mp4">
-    </video>
-
-    <!-- Overlay Content -->
-    <div class="overlay-content">
-        <header>
-            <h1>Welcome to La Pardor Car Wash</h1>
-            <p>Premium Tropical-Inspired Car Wash Experience</p>
-            <button class="login-btn" id="loginBtn">Login / Sign Up</button>
-            <button class="book-btn hidden" id="bookBtn">Book Appointment</button>
-            <button class="book-btn hidden" id="logoutBtn">Logout</button>
-        </header>
-    </div>
-
-    <!-- POPUP LOGIN MODAL -->
-    <div class="modal" id="loginModal">
-        <h2>Login / Sign Up</h2>
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <button onclick="signup()">Sign Up</button>
-        <button class="close-btn" onclick="closeModal()">Close</button>
-    </div>
-
+    
     <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 
-        // Your Firebase Config
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID",
-            measurementId: "YOUR_MEASUREMENT_ID"
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = { 
+            apiKey: "AIzaSyD7WxcybTS-Smz5ZDikSBAc-qNvwFhkGKA",
+            authDomain: "carwash-ce647.firebaseapp.com",
+            projectId: "carwash-ce647",
+            storageBucket: "carwash-ce647.firebasestorage.app",
+            messagingSenderId: "361218725682",
+            appId: "1:361218725682:web:294ca3d3db3ef642f6292b",
+            measurementId: "G-9SGVPNG2SK"
         };
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+    </script>
+</head>
+<body>
 
-        // DOM Elements
-        const loginBtn = document.getElementById("loginBtn");
-        const bookBtn = document.getElementById("bookBtn");
-        const logoutBtn = document.getElementById("logoutBtn");
-        const loginModal = document.getElementById("loginModal");
+    <header>
+        <h1>La Pardor Car Wash</h1>
+        <p>Premium car wash services at your convenience</p>
+        <button class="book-btn">Book Appointment</button>
+        <button id="loginBtn">Login</button>
+        <button id="logoutBtn" style="display: none;">Logout</button>
+    </header>
 
-        // Open & Close Modal
-        loginBtn.addEventListener("click", () => loginModal.style.display = "block");
-        function closeModal() { loginModal.style.display = "none"; }
+    <main>
+        <h2>Book Your Car Wash</h2>
+        <form onsubmit="goToSlots(event)">
+            <label for="name">Name:</label>
+            <input type="text" id="name" required>
 
-        // Login Function
-        function login() {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
-            signInWithEmailAndPassword(auth, email, password)
-                .then(() => { closeModal(); })
-                .catch(error => alert(error.message));
-        }
+            <label for="numberplate">Car Registration Plate:</label>
+            <input type="text" id="numberplate" required>
 
-        // Signup Function
-        function signup() {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
-            createUserWithEmailAndPassword(auth, email, password)
-                .then(() => { closeModal(); })
-                .catch(error => alert(error.message));
-        }
+            <button type="submit" class="next-btn">Proceed</button>
+        </form>
+    </main>
 
-        // Logout Function
-        logoutBtn.addEventListener("click", () => {
-            signOut(auth);
-        });
+    <!-- Firebase Authentication -->
+    <script>
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
 
-        // Authentication State Change
-        onAuthStateChanged(auth, user => {
+        // Check if user is logged in
+        firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                loginBtn.classList.add("hidden");
-                bookBtn.classList.remove("hidden");
-                logoutBtn.classList.remove("hidden");
+                loginBtn.style.display = "none";
+                logoutBtn.style.display = "block";
+                console.log("User logged in:", user.email);
             } else {
-                loginBtn.classList.remove("hidden");
-                bookBtn.classList.add("hidden");
-                logoutBtn.classList.add("hidden");
+                loginBtn.style.display = "block";
+                logoutBtn.style.display = "none";
             }
         });
+
+        // Login with email/password (Demo - replace with actual login UI)
+        loginBtn.addEventListener('click', () => {
+            const email = prompt("Enter your email:");
+            const password = prompt("Enter your password:");
+            
+            firebase.auth().signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                alert("Login successful!");
+            })
+            .catch((error) => {
+                alert("Error: " + error.message);
+            });
+        });
+
+        // Logout Function
+        logoutBtn.addEventListener('click', () => {
+            firebase.auth().signOut().then(() => {
+                alert("Logged out successfully!");
+            }).catch((error) => {
+                alert("Error logging out: " + error.message);
+            });
+        });
+
+        // Smooth scroll to booking section
+        document.querySelector('.book-btn').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Handle form submission and go to time slots
+        function goToSlots(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const numberPlate = document.getElementById('numberplate').value;
+
+            // Store data in Firestore
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    db.collection("customers").doc(user.uid).set({
+                        name: name,
+                        numberPlate: numberPlate,
+                        email: user.email
+                    }).then(() => {
+                        alert("Details submitted! Redirecting...");
+                        window.location.href = 'timeslot.html';
+                    }).catch((error) => {
+                        alert("Error saving details: " + error.message);
+                    });
+                } else {
+                    alert("Please log in to continue.");
+                }
+            });
+        }
     </script>
 
 </body>
