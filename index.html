@@ -5,15 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Pardor Car Wash</title>
     <link rel="stylesheet" href="styles.css">
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+</head>
+<body>
+    <header>
+        <h1>La Pardor Car Wash</h1>
+        <p>Quality car wash services at your convenience.</p>
+        <button class="book-btn">Book Appointment</button>
+        <button id="login-btn">Login</button>
+        <button id="logout-btn" style="display: none;">Logout</button>
+    </header>
+
+    <main>
+        <h2>Welcome to La Pardor Car Wash</h2>
+        <p>Book your appointment with ease and keep your car shining.</p>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 La Pardor Car Wash. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 
     <script>
         // Firebase Configuration
-        const firebaseConfig = { 
+        const firebaseConfig = {
             apiKey: "AIzaSyD7WxcybTS-Smz5ZDikSBAc-qNvwFhkGKA",
             authDomain: "carwash-ce647.firebaseapp.com",
             projectId: "carwash-ce647",
@@ -24,105 +42,49 @@
         };
 
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+        const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-    </script>
-</head>
-<body>
 
-    <header>
-        <h1>La Pardor Car Wash</h1>
-        <p>Premium car wash services at your convenience</p>
-        <button class="book-btn">Book Appointment</button>
-        <button id="loginBtn">Login</button>
-        <button id="logoutBtn" style="display: none;">Logout</button>
-    </header>
+        // Handle Authentication
+        const loginBtn = document.getElementById("login-btn");
+        const logoutBtn = document.getElementById("logout-btn");
 
-    <main>
-        <h2>Book Your Car Wash</h2>
-        <form onsubmit="goToSlots(event)">
-            <label for="name">Name:</label>
-            <input type="text" id="name" required>
-
-            <label for="numberplate">Car Registration Plate:</label>
-            <input type="text" id="numberplate" required>
-
-            <button type="submit" class="next-btn">Proceed</button>
-        </form>
-    </main>
-
-    <!-- Firebase Authentication -->
-    <script>
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-
-        // Check if user is logged in
-        firebase.auth().onAuthStateChanged((user) => {
+        auth.onAuthStateChanged(user => {
             if (user) {
                 loginBtn.style.display = "none";
-                logoutBtn.style.display = "block";
-                console.log("User logged in:", user.email);
+                logoutBtn.style.display = "inline-block";
             } else {
-                loginBtn.style.display = "block";
+                loginBtn.style.display = "inline-block";
                 logoutBtn.style.display = "none";
             }
         });
 
-        // Login with email/password (Demo - replace with actual login UI)
-        loginBtn.addEventListener('click', () => {
+        loginBtn.addEventListener("click", () => {
             const email = prompt("Enter your email:");
             const password = prompt("Enter your password:");
-            
-            firebase.auth().signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                alert("Login successful!");
-            })
-            .catch((error) => {
+            auth.signInWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    alert("Logged in successfully!");
+                })
+                .catch(error => {
+                    alert("Error: " + error.message);
+                });
+        });
+
+        logoutBtn.addEventListener("click", () => {
+            auth.signOut().then(() => {
+                alert("Logged out successfully!");
+            }).catch(error => {
                 alert("Error: " + error.message);
             });
         });
 
-        // Logout Function
-        logoutBtn.addEventListener('click', () => {
-            firebase.auth().signOut().then(() => {
-                alert("Logged out successfully!");
-            }).catch((error) => {
-                alert("Error logging out: " + error.message);
-            });
-        });
-
-        // Smooth scroll to booking section
+        // Smooth scroll to main content
         document.querySelector('.book-btn').addEventListener('click', function (e) {
             e.preventDefault();
             document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
         });
-
-        // Handle form submission and go to time slots
-        function goToSlots(event) {
-            event.preventDefault();
-            const name = document.getElementById('name').value;
-            const numberPlate = document.getElementById('numberplate').value;
-
-            // Store data in Firestore
-            firebase.auth().onAuthStateChanged((user) => {
-                if (user) {
-                    db.collection("customers").doc(user.uid).set({
-                        name: name,
-                        numberPlate: numberPlate,
-                        email: user.email
-                    }).then(() => {
-                        alert("Details submitted! Redirecting...");
-                        window.location.href = 'timeslot.html';
-                    }).catch((error) => {
-                        alert("Error saving details: " + error.message);
-                    });
-                } else {
-                    alert("Please log in to continue.");
-                }
-            });
-        }
     </script>
-
 </body>
 </html>
